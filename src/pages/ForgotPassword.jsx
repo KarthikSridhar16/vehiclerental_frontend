@@ -4,6 +4,10 @@ import { auth } from "../api/auth";
 import HeroShowcase from "../components/HeroShowcase";
 import "../styles/auth.css";
 
+function toast(message, ttl = 10000) {
+  window.dispatchEvent(new CustomEvent("toast:show", { detail: { message, ttl } }));
+}
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [ok, setOk] = useState(false);
@@ -12,13 +16,15 @@ export default function ForgotPassword() {
 
   async function onSubmit(e) {
     e.preventDefault();
+    if (!email || loading) return;
     setErr(null);
     try {
       setLoading(true);
       await auth.forgot(email.trim());
       setOk(true);
-    } catch (e) {
-      setErr(e?.response?.data?.message || "Something went wrong");
+      toast("Heads up: we’re in dev mode. The reset email may land in Spam — please check there.");
+    } catch (e2) {
+      setErr(e2?.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -33,7 +39,7 @@ export default function ForgotPassword() {
           <div className="auth-sub">We’ll email you a link to reset your password.</div>
 
           {ok ? (
-            <div className="auth-footnote" style={{textAlign:"left"}}>
+            <div className="auth-footnote" style={{ textAlign: "left" }}>
               If an account exists for <strong>{email}</strong>, a reset link has been sent.
               Please check your inbox and spam folder.
               <div style={{ marginTop: 10 }}>
@@ -57,7 +63,7 @@ export default function ForgotPassword() {
               </div>
 
               <div className="auth-actions">
-                <button className="btn btn-gold" type="submit" disabled={loading}>
+                <button className="btn btn-gold" type="submit" disabled={loading || !email.trim()}>
                   {loading ? "Sending…" : "Send reset link"}
                 </button>
                 <Link to="/login" className="btn btn-ghost">Back to login</Link>

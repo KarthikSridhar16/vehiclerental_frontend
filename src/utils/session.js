@@ -1,9 +1,37 @@
 const KEY = "auth.session";
 
-export function saveSession({ token, user }) {
-  const expiresAt = Date.now() + 15 * 60 * 1000;
-  const blob = { token, user, expiresAt };
+function decodeJwt(token) {
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return {};
+    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(decodeURIComponent(escape(json)));
+  } catch {
+    return {};
+  }
+}
+
+function computeExpiresAt({ token, exp, ttlMs }) {
+  const payloadExp = token ? Number(decodeJwt(token)?.exp || 0) : 0;
+  const unixSec = Number(exp || payloadExp || 0);
+  if (unixSec > 0) return unixSec * 1000;
+  const ttl = Number(ttlMs || 0) || 15 * 60 * 1000;
+  return Date.now() + ttl;
+}
+
+function broadcast(sessOrNull) {
+  try {
+    window.dispatchEvent(new CustomEvent("auth:changed", { detail: sessOrNull || null }));
+  } catch {}
+}
+
+export function saveSession({ token, user, exp, ttlMs }) {
+  if (!token) throw new Error("saveSession: token is required");
+  const expiresAt = computeExpiresAt({ token, exp, ttlMs });
+  const safeExpiresAt = Math.max(0, expiresAt - 30000);
+  const blob = { token, user: user || null, exp: Math.floor(safeExpiresAt / 1000), expiresAt: safeExpiresAt };
   localStorage.setItem(KEY, JSON.stringify(blob));
+  broadcast(blob);
   return blob;
 }
 
@@ -16,16 +44,22 @@ export function loadSession() {
   }
 }
 
-export function clearSession() {
+export function clearSession(shouldBroadcast = true) {
   localStorage.removeItem(KEY);
+  if (shouldBroadcast) broadcast(null);
 }
 
 export function isExpired(session = loadSession()) {
-  if (!session?.expiresAt) return true;
-  return Date.now() >= session.expiresAt;
+  const t = Number(session?.expiresAt || 0);
+  return !t || Date.now() >= t;
 }
 
 export function remainingMs(session = loadSession()) {
-  if (!session?.expiresAt) return 0;
-  return Math.max(0, session.expiresAt - Date.now());
+  const t = Number(session?.expiresAt || 0);
+  return Math.max(0, t - Date.now());
+}
+
+export function getToken() {
+  const s = loadSession();
+  return s?.token && !isExpired(s) ? s.token : null;
 }

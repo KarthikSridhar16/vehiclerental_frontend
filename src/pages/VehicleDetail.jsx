@@ -220,7 +220,8 @@ export default function VehicleDetail() {
 
     const token = getToken();
     if (!token) {
-      window.location = "/login?redirect=" + encodeURIComponent(window.location.pathname);
+      const here = window.location.pathname + window.location.search; // keep qs
+      window.location = "/login?redirect=" + encodeURIComponent(here);
       return;
     }
 
@@ -232,7 +233,8 @@ export default function VehicleDetail() {
         body: JSON.stringify({ vehicleId: id, start: startISO, end: endISO }),
       });
       const bid = d?.data?._id || d?._id;
-      window.location = `/checkout/${bid}`;
+      // 👇 add the flag so the toast shows on checkout
+      window.location = `/checkout/${bid}?mail=pending`;
     } catch (e2) {
       setCreateErr(e2.message || "Failed to create booking");
     } finally {
