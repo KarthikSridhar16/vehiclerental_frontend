@@ -1,0 +1,64 @@
+.v-section {
+    padding-block: 56px;
+}
+
+.services-title {
+    margin: 0 0 18px;
+    font-size: 28px;
+    letter-spacing: .5px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.svc-card {
+    position: relative;
+    border-radius: 18px;
+    padding: 18px 18px 20px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    background: rgba(255, 255, 255, .06);
+    min-height: 140px;
+}
+
+.svc-card--upcoming {
+    opacity: .7;
+    filter: grayscale(.2);
+}
+
+.svc-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin: 2px 0 8px;
+}
+
+.svc-copy {
+    color: #C9D5E8;
+    line-height: 1.5;
+}
+
+.svc-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 11px;
+    letter-spacing: .4px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .25);
+    backdrop-filter: blur(8px);
+}
+
+.svc-badge--live {
+    color: #1b1b1b;
+    background: var(--gold);
+    border-color: rgba(215, 182, 90, .55);
+}
+
+.svc-badge--upcoming {
+    color: #E8E6D7;
+    background: rgba(215, 182, 90, .18);
+    border-color: rgba(215, 182, 90, .35);
+}

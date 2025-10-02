@@ -1,0 +1,246 @@
+.vd-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr);
+  gap: 24px;
+}
+
+@media (max-width:1024px) {
+  .vd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vd-hero {
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .04);
+  box-shadow: 0 30px 120px rgba(0, 0, 0, .35);
+}
+
+.vd-hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.vd-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.thumb {
+  width: 88px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .06);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumb.active {
+  outline: 2px solid #D6B55B;
+  outline-offset: 2px;
+}
+
+
+.vd-book {
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: linear-gradient(180deg, rgba(16, 23, 42, .55), rgba(16, 23, 42, .36));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 30px 120px rgba(0, 0, 0, .35);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .18);
+  color: #EAF1FF;
+  border-radius: 14px;
+  padding: .85rem 1rem;
+  width: 100%;
+}
+
+.glass-input:hover {
+  background: rgba(255, 255, 255, .09);
+}
+
+
+.popover {
+  position: absolute;
+  z-index: 60;
+  margin-top: .5rem;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: linear-gradient(180deg, rgba(16, 23, 42, .96), rgba(16, 23, 42, .92));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 14px;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, .45);
+  padding: 8px;
+}
+
+
+.vd-daypicker {
+  --rdp-accent-color: #D6B55B;
+  --rdp-background-color: rgba(214, 181, 91, .12);
+  color: #EAF1FF;
+}
+
+.vd-daypicker .rdp-caption,
+.vd-daypicker .rdp-head_cell {
+  color: #EAF1FF;
+}
+
+.vd-daypicker .rdp-day {
+  border-radius: 10px;
+}
+
+.vd-daypicker .rdp-day_selected,
+.vd-daypicker .rdp-day_selected:focus-visible,
+.vd-daypicker .rdp-day_selected:hover {
+  background: var(--rdp-accent-color) !important;
+  color: #0b1222 !important;
+}
+
+.vd-daypicker .rdp-day_range_middle {
+  background: rgba(214, 181, 91, .15);
+  color: #EAF1FF;
+}
+
+.vd-daypicker .rdp-day_range_start,
+.vd-daypicker .rdp-day_range_end {
+  box-shadow: 0 0 0 2px #D6B55B inset;
+}
+
+.vd-daypicker .rdp-day_disabled {
+  opacity: .4;
+  text-decoration: line-through;
+}
+
+.vd-daypicker .rdp-button:hover {
+  background: rgba(255, 255, 255, .08);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .8rem 1.1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, .18);
+  color: #0b1222;
+  background: #fff;
+}
+
+.btn-outline {
+  padding: .6rem .9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  color: #EAF1FF;
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, .06);
+}
+
+.btn-book {
+  background: linear-gradient(180deg, #E7C86B, #D6B55B);
+  color: #0b1222;
+  border: 1px solid rgba(214, 181, 91, .75);
+  box-shadow: 0 12px 40px rgba(214, 181, 91, .35);
+}
+
+.btn-book:hover {
+  filter: brightness(1.05);
+}
+
+.btn-book:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.text-gold-500 {
+  color: #D6B55B;
+}
+
+.muted {
+  color: #9FB0C7;
+}
+
+
+.map-card {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 14px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: linear-gradient(180deg, rgba(16, 23, 42, .72), rgba(16, 23, 42, .58));
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+}
+
+.map-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-map {
+  background: linear-gradient(180deg, #e9cb7c, #d6b55b);
+  color: #0e1424;
+  font-weight: 700;
+  border: 1px solid rgba(214, 181, 91, .45);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 30px rgba(214, 181, 91, .25);
+  text-decoration: none;
+}
+
+.map-embed-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.map-embed {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+@media (max-width: 860px) {
+  .map-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vd-book .map-card {
+  grid-template-columns: 1fr;
+  padding: 12px;
+}
+
+.vd-book .map-embed-wrap {
+  aspect-ratio: 16 / 10;
+}
+
+.vd-book .btn-map {
+  width: 100%;
+  text-align: center;
+}

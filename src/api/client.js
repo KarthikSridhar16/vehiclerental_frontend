@@ -1,29 +1,37 @@
-import axios from 'axios'
+// src/api/client.js
+import axios from "axios";
+import { loadSession, isExpired, clearSession } from "../utils/session";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:8099'
-})
+  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:8099",
+});
 
-api.interceptors.request.use(cfg => {
-  const t = localStorage.getItem('token')
-  if (t) cfg.headers.Authorization = `Bearer ${t}`
-  return cfg
-})
+api.interceptors.request.use((cfg) => {
+  const sess = loadSession();
+  if (sess?.token && !isExpired(sess)) {
+    cfg.headers.Authorization = `Bearer ${sess.token}`;
+  } else if (sess) {
+    clearSession();
+    const here = window.location.pathname + window.location.search;
+    if (!here.startsWith("/login")) {
+      window.location.href = `/login?expired=1&redirect=${encodeURIComponent(here)}`;
+    }
+  }
+  return cfg;
+});
 
-// global 401 handler → send to login and preserve where we were
 api.interceptors.response.use(
-  r => r,
-  err => {
+  (r) => r,
+  (err) => {
     if (err?.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      const here = window.location.pathname + window.location.search
-      if (!here.startsWith('/login')) {
-        window.location.href = `/login?redirect=${encodeURIComponent(here)}`
+      clearSession();
+      const here = window.location.pathname + window.location.search;
+      if (!here.startsWith("/login")) {
+        window.location.href = `/login?expired=1&redirect=${encodeURIComponent(here)}`;
       }
     }
-    return Promise.reject(err)
+    return Promise.reject(err);
   }
-)
+);
 
-export default api
+export default api;

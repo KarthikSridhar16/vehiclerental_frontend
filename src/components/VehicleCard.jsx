@@ -1,26 +1,48 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
-export default function VehicleCard({ v }){
+function rupees(n) {
+  const v = Number(n || 0);
+  return v.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+}
+
+export default function VehicleCard({ v = {} }) {
+  const title = [v.make, v.model].filter(Boolean).join(" ");
+  const img = v.images?.[0] || "";
+  const location = v.location || "-";
+  const type = (v.type || "Vehicle").toString().charAt(0).toUpperCase() + (v.type || "vehicle").toString().slice(1);
+
   return (
-    <div className="card">
-      <img
-        src={v.images?.[0]}
-        alt={`${v.make} ${v.model}`}
-        className="w-full rounded"
-        style={{ height: 160, objectFit: 'cover' }}
-      />
-      <div className="mt-3">
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold">
-            {v.make} {v.model} <span className="text-gray-500 text-sm">({v.year})</span>
-          </h3>
-          <span className="font-bold">₹{v.pricePerDay}/day</span>
+    <Link to={`/vehicle/${v._id}`} className="v-card hover-lift" aria-label={`${title} details`}>
+      <div className="v-card-media">
+        {img ? (
+          <img
+            src={img}
+            alt={title}
+            loading="lazy"
+            decoding="async"
+            className="v-card-img"
+          />
+        ) : (
+          <div className="v-card-placeholder" aria-hidden />
+        )}
+
+        {/* price pill */}
+        <div className="v-price">{rupees(v.pricePerDay)}/day</div>
+      </div>
+
+      <div className="v-card-body">
+        <h3 className="v-card-title">
+          {title} {v.year ? <span className="v-year">({v.year})</span> : null}
+        </h3>
+
+        <div className="v-meta">
+          {type} <span className="dot">•</span> {location}
         </div>
-        <p className="muted">{v.type} · {v.location}</p>
-        <div className="mt-3">
-          <Link to={`/vehicle/${v._id}`} className="btn text-sm">View</Link>
+
+        <div className="v-card-actions">
+          <span className="btn btn-ghost">View</span>
         </div>
       </div>
-    </div>
-  )
+    </Link>
+  );
 }
