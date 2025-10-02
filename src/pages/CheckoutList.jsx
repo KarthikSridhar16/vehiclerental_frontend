@@ -3,7 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import "../styles/checkout.css";
 
-const API = (import.meta.env.VITE_API || "http://localhost:8099").replace(/\/$/, "");
+const API = (
+  import.meta.env.VITE_API_BASE?.trim() ||
+  import.meta.env.VITE_API?.trim() ||
+  "https://myvehiclerental-backend.onrender.com"
+).replace(/\/$/, "");
 
 function rupees(n) {
   const v = Number(n || 0);

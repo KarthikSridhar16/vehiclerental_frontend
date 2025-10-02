@@ -5,7 +5,11 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import "../styles/vehicle-detail.css";
 
-const API = (import.meta.env.VITE_API || "http://localhost:8099").replace(/\/$/, "");
+const API = (
+  import.meta.env.VITE_API_BASE?.trim() ||
+  import.meta.env.VITE_API?.trim() ||
+  "https://myvehiclerental-backend.onrender.com"
+).replace(/\/$/, "");
 
 async function getJSON(url, opts) {
   const res = await fetch(url, opts);
@@ -18,15 +22,18 @@ async function getJSON(url, opts) {
   if (!res.ok) throw new Error(data?.message || "Request failed");
   return data;
 }
+
 function rupees(n) {
   const v = Number(n || 0);
   return v.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 }
+
 function fmtRangeLabel(range) {
   if (!range?.from || !range?.to) return "Select dates";
   const f = dayjs(range.from), t = dayjs(range.to);
   return f.format("DD MMM") + " → " + t.format("DD MMM YYYY");
 }
+
 function useClickAway(ref, onAway) {
   useEffect(() => {
     function handler(e) { if (ref.current && !ref.current.contains(e.target)) onAway?.(); }
@@ -38,6 +45,7 @@ function useClickAway(ref, onAway) {
     };
   }, [onAway, ref]);
 }
+
 function getToken() {
   return localStorage.getItem("token") || sessionStorage.getItem("token");
 }
@@ -47,10 +55,9 @@ function buildMaps({ lat, lng, address = "" }) {
   const q = hasCoords ? `${lat},${lng}` : encodeURIComponent((address || "").trim());
   return {
     directions: `https://www.google.com/maps/dir/?api=1&destination=${q}`,
-    embed:      `https://www.google.com/maps?q=${q}&z=15&output=embed`,
+    embed: `https://www.google.com/maps?q=${q}&z=15&output=embed`,
   };
 }
-
 
 const TIME_OPTS = Array.from({ length: 48 }, (_, i) => {
   const h = String(Math.floor(i / 2)).padStart(2, "0");
@@ -127,7 +134,6 @@ export default function VehicleDetail() {
           const list1 = Array.isArray(d1?.data) ? d1.data : Array.isArray(d1) ? d1 : [];
           if (on) { setReviews(list1); return; }
         } catch {
-
           try {
             const d2 = await getJSON(`${API}/reviews?vehicleId=${id}&status=approved`);
             const list2 = Array.isArray(d2?.data) ? d2.data : Array.isArray(d2) ? d2 : [];
@@ -197,7 +203,6 @@ export default function VehicleDetail() {
   const endRef = useRef(null);
   useClickAway(endRef, () => setOpenEnd(false));
 
-
   async function onCreateBooking(e) {
     e.preventDefault();
     setCreateErr(null);
@@ -235,7 +240,6 @@ export default function VehicleDetail() {
     }
   }
 
-
   if (loading) return <div>Loading…</div>;
   if (err) return <div className="p-3 border rounded bg-red-50 text-red-700">{err}</div>;
   if (!v) return null;
@@ -251,7 +255,6 @@ export default function VehicleDetail() {
 
   return (
     <div className="container-xl py-6 space-y-8">
-      {/* Header */}
       <header className="space-y-2">
         <h1 className="text-3xl font-[Cinzel] tracking-wide">
           {v.make} {v.model} {v.year ? `(${v.year})` : ""}
@@ -295,7 +298,6 @@ export default function VehicleDetail() {
           <h3 className="text-lg font-semibold mb-3">Book this vehicle</h3>
 
           <div className="space-y-3">
-            {/* Dates */}
             <div className="relative" ref={calRef}>
               <button
                 type="button"
@@ -331,7 +333,6 @@ export default function VehicleDetail() {
               )}
             </div>
 
-            {/* Start time */}
             <div className="relative" ref={startRef}>
               <button
                 type="button"
@@ -361,7 +362,6 @@ export default function VehicleDetail() {
               )}
             </div>
 
-            {/* End time */}
             <div className="relative" ref={endRef}>
               <button
                 type="button"
@@ -392,7 +392,6 @@ export default function VehicleDetail() {
             </div>
           </div>
 
-          {/* Summary + Submit */}
           <div className="space-y-3 mt-4">
             <div className="text-gray-200">
               Estimated total (rounded to full days): <strong>{rupees(estimated)}</strong>
@@ -418,7 +417,6 @@ export default function VehicleDetail() {
             </div>
           </div>
 
-          {/* Pickup location */}
           <section className="space-y-3 mt-8">
             <h2 className="text-lg font-semibold">Pickup location</h2>
             <div className="map-card">
@@ -452,7 +450,6 @@ export default function VehicleDetail() {
         </aside>
       </div>
 
-      {/* Reviews */}
       <section className="space-y-3">
         <h3 className="text-xl font-semibold">Reviews</h3>
         {reviewsLoading && <div>Loading reviews…</div>}
