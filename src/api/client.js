@@ -2,8 +2,14 @@
 import axios from "axios";
 import { loadSession, isExpired, clearSession } from "../utils/session";
 
+const BASE = (
+  import.meta.env.VITE_API_BASE?.trim() ||
+  import.meta.env.VITE_API?.trim() ||
+  "http://localhost:8099"
+).replace(/\/$/, "");
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:8099",
+  baseURL: BASE,
 });
 
 api.interceptors.request.use((cfg) => {
