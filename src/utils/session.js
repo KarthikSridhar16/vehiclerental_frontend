@@ -1,4 +1,14 @@
 const KEY = "auth.session";
+const LEGACY_KEYS = ["token", "user"];
+
+function nukeLegacy() {
+  try {
+    for (const k of LEGACY_KEYS) {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    }
+  } catch {}
+}
 
 function decodeJwt(token) {
   try {
@@ -29,8 +39,14 @@ export function saveSession({ token, user, exp, ttlMs }) {
   if (!token) throw new Error("saveSession: token is required");
   const expiresAt = computeExpiresAt({ token, exp, ttlMs });
   const safeExpiresAt = Math.max(0, expiresAt - 30000);
-  const blob = { token, user: user || null, exp: Math.floor(safeExpiresAt / 1000), expiresAt: safeExpiresAt };
+  const blob = {
+    token,
+    user: user || null,
+    exp: Math.floor(safeExpiresAt / 1000),
+    expiresAt: safeExpiresAt,
+  };
   localStorage.setItem(KEY, JSON.stringify(blob));
+  nukeLegacy();
   broadcast(blob);
   return blob;
 }
@@ -45,7 +61,10 @@ export function loadSession() {
 }
 
 export function clearSession(shouldBroadcast = true) {
-  localStorage.removeItem(KEY);
+  try {
+    localStorage.removeItem(KEY);
+    nukeLegacy();
+  } catch {}
   if (shouldBroadcast) broadcast(null);
 }
 

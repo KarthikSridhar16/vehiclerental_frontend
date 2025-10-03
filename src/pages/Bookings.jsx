@@ -1,4 +1,3 @@
-// src/pages/Bookings.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
@@ -57,7 +56,6 @@ function mailNotice(kind) {
   return base;
 }
 
-/* ---------- page ---------- */
 export default function Bookings() {
   const loc = useLocation();
 
@@ -92,7 +90,9 @@ export default function Bookings() {
     (async () => {
       try {
         setLoading(true);
-        const res = await client.get("/bookings/me");
+        const res = await client.get("/bookings/me", {
+          headers: { "Cache-Control": "no-store", "Pragma": "no-cache" }
+        });
         const list = pickBookingsArray(res?.data);
         if (on) setRowsSrc(list);
       } catch {
@@ -122,7 +122,7 @@ export default function Bookings() {
     const idsNeeded = [...new Set(rows.map((b) => b?.vehicleId).filter(Boolean).filter((id) => !vehiclesById[id] && !bHasVehicleObj(rows, id)))];
     if (idsNeeded.length === 0) return;
     (async () => {
-      const results = await Promise.allSettled(idsNeeded.map((id) => client.get(`/vehicles/${id}`)));
+      const results = await Promise.allSettled(idsNeeded.map((id) => client.get(`/vehicles/${id}`, { headers: { "Cache-Control": "no-store" } })));
       if (!on) return;
       const next = { ...vehiclesById };
       results.forEach((r) => {
@@ -134,7 +134,7 @@ export default function Bookings() {
       setVehiclesById(next);
     })();
     return () => { on = false; };
-  }, [rows]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [rows]); 
 
   useEffect(() => {
     let on = true;
@@ -146,7 +146,7 @@ export default function Bookings() {
         const pairs = await Promise.all(
           vids.map(async (vid) => {
             try {
-              const r = await client.get("/reviews/me", { params: { vehicleId: vid } });
+              const r = await client.get("/reviews/me", { params: { vehicleId: vid }, headers: { "Cache-Control": "no-store" } });
               return [vid, r?.data || null];
             } catch {
               return [vid, null];
@@ -205,7 +205,7 @@ export default function Bookings() {
 
   useEffect(() => {
     const params = new URLSearchParams(loc.search || "");
-    const kind = params.get("mail") || params.get("notice"); // pending | confirmed | reset
+    const kind = params.get("mail") || params.get("notice");
     if (!kind) return;
     toast(mailNotice(kind), 10000);
     params.delete("mail"); params.delete("notice");
@@ -218,7 +218,6 @@ export default function Bookings() {
   return (
     <div className="bk-wrap max-w-5xl mx-auto p-4 md:p-6">
       <h1 className="text-2xl font-semibold mb-4">Your Bookings</h1>
-
       <div className="overflow-x-auto rounded border">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50">

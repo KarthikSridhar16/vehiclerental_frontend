@@ -1,6 +1,8 @@
+// src/pages/AuthRegister.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api/client";
+import { saveSession, clearSession } from "../utils/session";
 import HeroShowcase from "../components/HeroShowcase";
 import "../styles/auth.css";
 
@@ -18,11 +20,14 @@ export default function AuthRegister({ onAuth }) {
     setErr("");
     setBusy(true);
     try {
+      clearSession(false);
       const r = await api.post("/auth/register", { name, email, password });
-      onAuth?.(r.data);
-      nav("/search", { replace: true });
+      const { token, user } = r.data || {};
+      saveSession({ token, user });
+      onAuth?.({ token, user });
+      nav("/bookings", { replace: true });
     } catch (ex) {
-      setErr(ex?.response?.data?.error || "Registration failed");
+      setErr(ex?.response?.data?.message || ex?.response?.data?.error || "Registration failed");
     } finally {
       setBusy(false);
     }
@@ -31,7 +36,6 @@ export default function AuthRegister({ onAuth }) {
   return (
     <div className="auth-bg">
       <HeroShowcase />
-
       <div className="auth-overlay">
         <form onSubmit={submit} className="auth-card glass-strong">
           <h1 className="auth-title v-h">Create account</h1>
@@ -41,25 +45,12 @@ export default function AuthRegister({ onAuth }) {
 
           <div className="auth-row">
             <label className="auth-label" htmlFor="name">Name</label>
-            <input
-              id="name"
-              className="input auth-input"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-            />
+            <input id="name" className="input auth-input" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
 
           <div className="auth-row">
             <label className="auth-label" htmlFor="email">Email</label>
-            <input
-              id="email"
-              className="input auth-input"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-            />
+            <input id="email" className="input auth-input" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
           </div>
 
           <div className="auth-row">
@@ -70,32 +61,23 @@ export default function AuthRegister({ onAuth }) {
                 type={showPassword ? "text" : "password"}
                 className="input auth-input"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"
                 required
               />
-              <button
-                type="button"
-                className="eye-btn"
-                onClick={() => setShowPassword(prev => !prev)}
-              >
+              <button type="button" className="eye-btn" onClick={() => setShowPassword((v) => !v)}>
                 {showPassword ? "🙈" : "👁"}
               </button>
             </div>
           </div>
 
           <div className="auth-actions">
-            <button className="btn btn-gold" disabled={busy} type="submit">
-              {busy ? "Creating…" : "Sign up"}
-            </button>
-            <button className="btn btn-ghost" type="button" onClick={() => nav("/login")}>
-              Login
-            </button>
+            <button className="btn btn-gold" disabled={busy} type="submit">{busy ? "Creating…" : "Sign up"}</button>
+            <button className="btn btn-ghost" type="button" onClick={() => nav("/login")}>Login</button>
           </div>
 
           <div className="auth-footnote">
-            Already have an account?{" "}
-            <Link to="/login" className="auth-link">Login</Link>
+            Already have an account? <Link to="/login" className="auth-link">Login</Link>
           </div>
         </form>
       </div>

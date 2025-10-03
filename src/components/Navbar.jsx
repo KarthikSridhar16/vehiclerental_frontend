@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
+import { logoutAndReload } from "../utils/logout";
 import "../styles/navbar.css";
 
 export default function Navbar({ user, onLogout }) {
@@ -19,13 +20,18 @@ export default function Navbar({ user, onLogout }) {
     const query = q.trim();
     setOpenMobileSearch(false);
     nav(query ? `/search?q=${encodeURIComponent(query)}` : "/search");
-    setQ(""); 
+    setQ("");
   }
 
   function goBrowse() {
     setOpenMobileSearch(false);
     setQ("");
     nav("/search");
+  }
+
+  function handleLogout() {
+    if (typeof onLogout === "function") onLogout();
+    else logoutAndReload();
   }
 
   useEffect(() => {
@@ -74,16 +80,13 @@ export default function Navbar({ user, onLogout }) {
         <div className="vc-container vc-nav-inner">
           {Brand}
 
-          {/* Desktop search */}
           <form className="vc-search vc-search--desktop" onSubmit={onSubmit}>
-            {/* Magnifier acts as quick “browse all” */}
             <button type="button" className="vc-icon-btn" aria-label="Browse all vehicles" onClick={goBrowse}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-3.5-3.5" />
               </svg>
             </button>
-
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -93,9 +96,7 @@ export default function Navbar({ user, onLogout }) {
             <button type="submit" className="btn btn-gold">Search</button>
           </form>
 
-          {/* Right actions */}
           <div className="vc-actions">
-            {/* REPLACED: Browse -> Admin for admins */}
             {isAdmin ? (
               <Link to="/admin" className="btn btn-ghost">Admin</Link>
             ) : (
@@ -132,7 +133,7 @@ export default function Navbar({ user, onLogout }) {
                 <>
                   <Link to="/checkout-list" className="btn btn-ghost">Checkout</Link>
                   <Link to="/bookings" className="btn btn-ghost">Bookings</Link>
-                  <button className="btn btn-ghost" onClick={onLogout}>Logout</button>
+                  <button className="btn btn-ghost" onClick={handleLogout}>Logout</button>
                   <span className="vc-avatar" title={user.name || "Account"}>{initials}</span>
                 </>
               ) : (
@@ -145,7 +146,6 @@ export default function Navbar({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Mobile search drawer */}
         <div className={`vc-search-drawer ${openMobileSearch ? "open" : ""}`}>
           <form className="vc-search vc-search--mobile" onSubmit={onSubmit}>
             <button type="button" className="vc-icon-btn" aria-label="Browse all vehicles" onClick={goBrowse}>
@@ -166,7 +166,6 @@ export default function Navbar({ user, onLogout }) {
         </div>
       </header>
 
-      {/* Off-canvas mobile menu */}
       {createPortal(
         <div className={`vc-menu ${openMenu ? "open" : ""}`}>
           <button className="vc-menu-overlay" aria-label="Close menu" onClick={() => setOpenMenu(false)} />
@@ -187,7 +186,7 @@ export default function Navbar({ user, onLogout }) {
                   <li><Link to="/bookings" onClick={() => setOpenMenu(false)}>Bookings</Link></li>
                   {isAdmin && <li><Link to="/admin" onClick={() => setOpenMenu(false)}>Admin</Link></li>}
                   <li>
-                    <button className="linkish" onClick={() => { setOpenMenu(false); onLogout?.(); }}>
+                    <button className="linkish" onClick={() => { setOpenMenu(false); handleLogout(); }}>
                       Logout
                     </button>
                   </li>
